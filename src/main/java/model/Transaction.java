@@ -1,7 +1,7 @@
 package model;
 
 import model.Category;
-import model.Type;
+import model.TransactionType;
 import java.time.LocalDate;
 
 
@@ -11,12 +11,12 @@ public class Transaction {
 
     private int id;
     private double amount;
-    private Type type;
+    private TransactionType type;
     private Category category;
     private String description;
     private LocalDate date;
 
-    public Transaction(double amount, Type type, Category category, String description) {
+    public Transaction(double amount, TransactionType type, Category category, String description) {
         this.id = nextId++;
         this.amount = amount;
         this.type = type;
@@ -37,11 +37,11 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public Type getType() {
+    public TransactionType getType() {
         return this.type;
     }
 
-    public void setType(Type type) {
+    public void setType(TransactionType type) {
         this.type = type;
     }
 
