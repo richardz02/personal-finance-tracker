@@ -21,30 +21,54 @@ public class App {
             System.out.println("2. Add expense");
             System.out.println("3. View all transactions");
             System.out.println("4. View by category");
-            System.out.println("5, View summary");
+            System.out.println("5. View summary");
             System.out.println("6. Save and exit");
             System.out.println("====================================");
             System.out.print("Select an option: ");
 
             Scanner sc = new Scanner(System.in);
-            int action = Integer.parseInt(sc.nextLine());
+            // Set default value to -1
+            // User input validation
+            int action = -1;
+            try {
+                action = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+            }
 
             switch(action) {
                 case 1:
                     {
-                        System.out.print("Enter amount ($): ");
-                        double amount = Double.parseDouble(sc.nextLine());
+                        double amount;
+                        while (true) {
+                            System.out.print("Enter amount ($): ");
+                            try {
+                                amount = Double.parseDouble(sc.nextLine());
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Invalid input. Please enter a valid number.");
+                            }
+                        }
 
                         System.out.print("Enter description: ");
                         String description = sc.nextLine();
 
-                        System.out.print("Select category ( ");
-                        for (Category category : Category.values()) {
-                            System.out.print(category + " ");
+                        Category category;
+                        while (true) {
+                            System.out.print("Select category ( ");
+                            for (Category tag : Category.values()) {
+                                System.out.print(tag + " ");
+                            }
+                            System.out.print("): ");
+                            String strCategory = sc.nextLine().toUpperCase();
+
+                            try {
+                                category = Category.valueOf(strCategory);
+                                break;
+                            } catch (IllegalArgumentException e) {
+                                System.out.println("Category does not exist");
+                            }
                         }
-                        System.out.print("): ");
-                        String tag = sc.nextLine().toUpperCase();
-                        Category category = Category.valueOf(tag);
 
                         Transaction newTransaction = new Transaction(amount, TransactionType.INCOME, category, description);
                         manager.addTransaction(newTransaction);
@@ -55,19 +79,36 @@ public class App {
                     break;
                 case 2:
                     {
-                        System.out.print("Enter amount ($): ");
-                        double amount = Double.parseDouble(sc.nextLine());
+                        double amount;
+                        while (true) {
+                            System.out.print("Enter amount ($): ");
+                            try {
+                                amount = Double.parseDouble(sc.nextLine());
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Invalid input. Please enter a valid number.");
+                            }
+                        }
 
                         System.out.print("Enter description: ");
                         String description = sc.nextLine();
 
-                        System.out.print("Select category ( ");
-                        for (Category category : Category.values()) {
-                            System.out.print(category + " ");
+                        Category category;
+                        while (true) {
+                            System.out.print("Select category ( ");
+                            for (Category tag : Category.values()) {
+                                System.out.print(tag + " ");
+                            }
+                            System.out.print("): ");
+                            String strCategory = sc.nextLine().toUpperCase();
+
+                            try {
+                                category = Category.valueOf(strCategory);
+                                break;
+                            } catch (IllegalArgumentException e) {
+                                System.out.println("Category does not exist");
+                            }
                         }
-                        System.out.print("): ");
-                        String tag = sc.nextLine().toUpperCase();
-                        Category category = Category.valueOf(tag);
 
                         Transaction newTransaction = new Transaction(amount, TransactionType.EXPENSE, category, description);
                         manager.addTransaction(newTransaction);
@@ -81,24 +122,43 @@ public class App {
 
                     break;
                 case 4:
-                    // Display menu choices for view by category
-                    System.out.println("View by category: ");
-                    System.out.println("1. View one category");
-                    System.out.println("2. View grouped all by categories");
-                    System.out.print("Select an option: ");
+                    int choice = -1;
 
-                    int choice = Integer.parseInt(sc.nextLine());
+                    while (true) {
+                        // Display menu choices for view by category
+                        System.out.println("View by category: ");
+                        System.out.println("1. View one category");
+                        System.out.println("2. View grouped all by categories");
+                        System.out.print("Select an option: ");
+
+                        try {
+                            choice = Integer.parseInt(sc.nextLine());
+                            break;
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input. Please enter a valid number.");
+                        }
+
+                    }
 
                     switch (choice) {
                         case 1:
-                            System.out.print("Available categories: ");
-                            for (Category category : Category.values()) {
-                                System.out.print(category + " ");
-                            }
+                            Category category;
 
-                            System.out.print("\nSelect a category to view: ");
-                            String tag = sc.nextLine().toUpperCase();
-                            Category category = Category.valueOf(tag);
+                            while (true) {
+                                System.out.println("Available categories: ");
+                                for (Category tag : Category.values()) {
+                                    System.out.print(tag + " ");
+                                }
+
+                                System.out.print("\nSelect a category to view: ");
+                                String strCategory = sc.nextLine().toUpperCase();
+                                try {
+                                    category = Category.valueOf(strCategory);
+                                    break;
+                                } catch (IllegalArgumentException e) {
+                                    System.out.println("Category doesn't exist");
+                                }
+                            }
                             manager.viewSpecificCategoryTransactions(category);
 
                             break;
@@ -107,7 +167,6 @@ public class App {
 
                             break;
                         default:
-                            System.out.println("Invalid input");
                             break;
                     }
 
@@ -121,7 +180,6 @@ public class App {
                     System.exit(0);
                     break;
                 default:
-                    System.out.println("Invalid input, try again");
                     break;
             }
         }
