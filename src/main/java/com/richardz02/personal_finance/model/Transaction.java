@@ -3,6 +3,9 @@ package com.richardz02.personal_finance.model;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 enum TransactionType {
     EXPENSE,
     INCOME
@@ -15,12 +18,15 @@ public class Transaction {
     private double amount; 
     private String description;
 
-    public Transaction(double amount, String description, String transactionType) {
+    @JsonCreator
+    public Transaction(@JsonProperty("amount") double amount, 
+                       @JsonProperty("description") String description, 
+                       @JsonProperty("transactionType") String transactionType) {
         this.id = UUID.randomUUID();
         this.date = LocalDate.now();
-        this.transactionType = TransactionType.valueOf(transactionType);
         this.amount = amount;
         this.description = description;
+        this.transactionType = TransactionType.valueOf(transactionType);
     }
 
     // Getters 
