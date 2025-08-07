@@ -3,7 +3,6 @@ package com.richardz02.personal_finance.controller;
 import java.io.IOException;
 import java.util.*;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,7 +21,7 @@ import com.richardz02.personal_finance.service.TransactionService;
 @RestController
 public class TransactionController {
 
-    private TransactionService transactionService; 
+    private final TransactionService transactionService; 
 
     public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
@@ -63,7 +62,6 @@ public class TransactionController {
         try {
             transactionService.saveToFile();
             return ResponseEntity.ok(new ApiResponse("Saved to file"));
-        
         } catch (JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage()));
         } catch (IOException e) {

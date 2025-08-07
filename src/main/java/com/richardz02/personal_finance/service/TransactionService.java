@@ -71,6 +71,7 @@ public class TransactionService {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
+        // Read entire json file content into a string
         String fileContent = Files.readString(Paths.get("transactions.json"));
         transactions = mapper.readValue(fileContent, new TypeReference<ArrayList<Transaction>>() {});
     }
