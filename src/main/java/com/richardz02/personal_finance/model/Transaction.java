@@ -3,30 +3,30 @@ package com.richardz02.personal_finance.model;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
-enum TransactionType {
-    EXPENSE,
-    INCOME
-}
-
+@Entity
 public class Transaction {
-    private UUID id; 
+    @Id
+    private UUID id;  // Make id the primary key in the database
     private LocalDate date;
     private TransactionType transactionType;
     private double amount; 
     private String description;
 
-    @JsonCreator
-    public Transaction(@JsonProperty("amount") double amount, 
-                       @JsonProperty("description") String description, 
-                       @JsonProperty("transactionType") String transactionType) {
+    // Required default no-args constructor since JPA uses reflection to create entity objects
+    public Transaction() {
         this.id = UUID.randomUUID();
         this.date = LocalDate.now();
+    }
+
+    // Custom constructor
+    public Transaction(double amount, String description, String transactionType) {
+        this();
+        this.transactionType = TransactionType.valueOf(transactionType);
         this.amount = amount;
         this.description = description;
-        this.transactionType = TransactionType.valueOf(transactionType);
     }
 
     // Getters 
