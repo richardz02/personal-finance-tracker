@@ -1,78 +1,62 @@
 package com.richardz02.personal_finance.service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
+import com.richardz02.personal_finance.dto.transaction.TransactionRequestDTO;
+import com.richardz02.personal_finance.dto.transaction.TransactionResponseDTO;
+import com.richardz02.personal_finance.exception.transaction.NoTransactionsException;
+import com.richardz02.personal_finance.exception.transaction.TransactionNotFoundException;
 import com.richardz02.personal_finance.model.Transaction;
+import com.richardz02.personal_finance.model.TransactionType;
+import com.richardz02.personal_finance.repository.TransactionRepository;
 
 @Service
 public class TransactionService {
-    ArrayList<Transaction> transactions = new ArrayList<>();
-    
-    public void addTransaction(Transaction transaction) {
-        transactions.add(transaction);
+    private final TransactionRepository transactionRepository;
+
+    // Inject dependency
+    public TransactionService(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
     }
 
-    public void deleteTransaction(String id) {
-        // First check if the transaction array is empty
-        if (transactions.isEmpty()) {
-            throw new IllegalStateException("No transactions");
+    public List<Transaction> getAllTransactions() {
+        return transactionRepository.findAll();        
+    }
+
+    public void addTransaction(TransactionRequestDTO transactionRequest) {
+        Transaction transaction = new Transaction();
+        transaction.setTransactionType(transactionRequest.getTransactionType());
+        transaction.setAmount(transactionRequest.getAmount());
+        transaction.setDescription(transactionRequest.getDescription());
+        transactionRepository.save(transaction);
+    }
+
+    public TransactionResponseDTO getTransactionById(UUID id) {
+        // Get the Transaction object from the database
+        Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new TransactionNotFoundException(id));
+
+        // Construct a new instance of TransactionResponseDTO 
+        TransactionResponseDTO transactionResponse = new TransactionResponseDTO(
+            transaction.getDate(),
+            TransactionType.valueOf(transaction.getTransactionType()),
+            transaction.getAmount(),
+            transaction.getDescription()
+        );
+
+        return transactionResponse;
+    }
+
+    public void deleteTransaction(UUID id) {
+        // If no transactions exist, throw exception
+        if (transactionRepository.count() == 0) {
+            throw new NoTransactionsException();
         }
 
-        // Otherwise, look for the transaction to delete
-        Iterator<Transaction> it = transactions.iterator();
-        while (it.hasNext()) {
-            Transaction t = it.next();
-            if (t.getId().equals(id)) {
-                it.remove();
-                return;
-            }
-        }
-
-        throw new NoSuchElementException("Transaction with id " + id + " doesn't exist");
-    }
-
-    public ArrayList<Transaction> getAllTransactions() {
-        return transactions;        
-    }
-
-    public void saveToFile() throws JsonProcessingException, IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        
-        // Register the time module because Jackson doesn't support handling the Java LocalDate object by default
-        mapper.registerModule(new JavaTimeModule());
-
-        // Enable pretty printing for better readability (Don't use in production, only for local development)
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-        // Serialize the array of transactions into json format string
-        String jsonString = mapper.writeValueAsString(transactions);
-                    
-        // Save to file 
-        FileWriter writer = new FileWriter("transactions.json");
-        writer.write(jsonString); 
-        writer.close();
-    }
-
-    public void loadFromFile() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-
-        // Read entire json file content into a string
-        String fileContent = Files.readString(Paths.get("transactions.json"));
-        transactions = mapper.readValue(fileContent, new TypeReference<ArrayList<Transaction>>() {});
+        // Check if the transaction can be found in the database
+        transactionRepository.findById(id).orElseThrow(() -> new TransactionNotFoundException(id));
+        transactionRepository.deleteById(id);
     }
 }

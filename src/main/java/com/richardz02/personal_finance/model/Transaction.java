@@ -51,8 +51,8 @@ public class Transaction {
     }
 
     // Setters
-    public void setTransactionType(String newTransactionType) {
-        this.transactionType = TransactionType.valueOf(newTransactionType);
+    public void setTransactionType(TransactionType newTransactionType) {
+        this.transactionType = newTransactionType;
     }
 
     public void setAmount(double newAmount) {
