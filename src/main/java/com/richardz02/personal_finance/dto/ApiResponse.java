@@ -1,17 +1,37 @@
 package com.richardz02.personal_finance.dto;
 
-public class ApiResponse {
+public class ApiResponse<T> {
+    private String status;
     private String message;
+    private T data;
 
-    public ApiResponse(String message) {
+    // Constructor
+    public ApiResponse(String status, String message, T data) {
+        this.status = status;
         this.message = message;
+        this.data = data;
+    }
+
+    // Getters & Setters
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getMessage() {
-        return this.message;
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public void setMessage(String newMessage) {
-        this.message = newMessage;
+    public T getData() {
+        return data;
+    }
+    public void setData(T data) {
+        this.data = data;
     }
 }
+
