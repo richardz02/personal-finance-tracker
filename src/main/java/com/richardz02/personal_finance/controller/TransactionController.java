@@ -1,7 +1,9 @@
 package com.richardz02.personal_finance.controller;
 
+import java.time.LocalDate;
 import java.util.*;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,12 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.richardz02.personal_finance.dto.ApiResponse;
+import com.richardz02.personal_finance.dto.transaction.SummaryWithTransactions;
 import com.richardz02.personal_finance.dto.transaction.TransactionRequest;
 import com.richardz02.personal_finance.dto.transaction.TransactionResponse;
-import com.richardz02.personal_finance.dto.transaction.TransactionSummary;
 import com.richardz02.personal_finance.model.Transaction;
 import com.richardz02.personal_finance.service.TransactionService;
 
@@ -71,10 +74,12 @@ public class TransactionController {
         return ResponseEntity.ok().body(response);
     }
 
+    // Todo: API end points which takes in a param "period" which is specified by the user to view all transactions
+    // in this period of time (day, week, month, year, all time)
     @GetMapping("/transactions/summary")
-    public ResponseEntity<ApiResponse<TransactionSummary>> getTransactionSummary() {
-        TransactionSummary transactionSummary = transactionService.getSummary();
-        ApiResponse<TransactionSummary> response = new ApiResponse<TransactionSummary>("success", "Fetched transaction summary", transactionSummary);
+    public ResponseEntity<ApiResponse<SummaryWithTransactions>> getTransactionSummary(@RequestParam(defaultValue = "day") String period) {
+        SummaryWithTransactions summaryWithTransactions = transactionService.getSummary(period);
+        ApiResponse<SummaryWithTransactions> response = new ApiResponse<SummaryWithTransactions>("success", "Fetched transaction summary for " + period, summaryWithTransactions);
         return ResponseEntity.ok().body(response);
     }
 };

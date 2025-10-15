@@ -1,10 +1,13 @@
 package com.richardz02.personal_finance.service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.richardz02.personal_finance.dto.transaction.SummaryWithTransactions;
 import com.richardz02.personal_finance.dto.transaction.TransactionRequest;
 import com.richardz02.personal_finance.dto.transaction.TransactionResponse;
 import com.richardz02.personal_finance.dto.transaction.TransactionSummary;
@@ -84,7 +87,33 @@ public class TransactionService {
         transactionRepository.deleteById(id);
     }
 
-    public TransactionSummary getSummary() {
-        return transactionRepository.transactionSummary();
+    public SummaryWithTransactions getSummary(String period) {
+        // Define a start and end date to query the database for transaction summary
+        LocalDate startDate;
+        LocalDate endDate = LocalDate.now();
+
+        // Based on the user selected period, set start date
+        switch (period.toLowerCase()) {
+            case "day":
+                startDate = endDate; 
+                break;
+            case "week": 
+                startDate = endDate.with(DayOfWeek.MONDAY);
+                break;
+            case "month":
+                startDate = endDate.withDayOfMonth(1);
+                break;
+            case "year":
+                startDate = endDate.withDayOfYear(1);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid period: " + period);
+        }
+
+        TransactionSummary summary = transactionRepository.transactionSummary(startDate, endDate);
+        List<Transaction> transactionsList = transactionRepository.findTransactionsInPeriod(startDate, endDate);
+
+        SummaryWithTransactions summaryWithTransactions = new SummaryWithTransactions(summary, transactionsList);
+        return summaryWithTransactions;
     }
 }

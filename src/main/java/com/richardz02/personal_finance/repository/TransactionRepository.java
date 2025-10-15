@@ -1,5 +1,7 @@
 package com.richardz02.personal_finance.repository;
 
+import java.util.List;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +13,10 @@ import com.richardz02.personal_finance.dto.transaction.TransactionSummary;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-    /*  Since we are using enum class to represent the transaction types, in the database
-        income will have a value of 0, and expense will have a value of 1
+    /** This query returns the total income, total expense, and balance in a given time period
+    *
+    *   Since we are using enum class to represent the transaction types, in the database
+    *   income will have a value of 0, and expense will have a value of 1
     */
     @Query("""
             SELECT new com.richardz02.personal_finance.dto.transaction.TransactionSummary (
@@ -22,6 +26,15 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
                 SUM(CASE WHEN t.transactionType = 1 THEN t.amount ELSE 0 END)
             )
             FROM Transaction t
+            WHERE t.date BETWEEN :startDate AND :endDate
             """)
-    TransactionSummary transactionSummary();
+    TransactionSummary transactionSummary(LocalDate startDate, LocalDate endDate);
+
+    // This query returns a list of transactions in a given time period
+    @Query("""
+            SELECT t
+            FROM Transaction t
+            WHERE t.date BETWEEN :startDate AND :endDate
+            """)
+    List<Transaction> findTransactionsInPeriod(LocalDate startDate, LocalDate endDate);
 }
