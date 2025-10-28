@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.aspectj.internal.lang.annotation.ajcPrivileged;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,8 +14,11 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.richardz02.personal_finance.dto.ApiResponse;
+import com.richardz02.personal_finance.exception.auth.AuthenticationException;
 import com.richardz02.personal_finance.exception.transaction.NoTransactionsException;
 import com.richardz02.personal_finance.exception.transaction.TransactionNotFoundException;
+import com.richardz02.personal_finance.exception.user.UserAlreadyExistsException;
+import com.richardz02.personal_finance.exception.user.UserNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -70,5 +74,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleTransactionNotFound(TransactionNotFoundException e) {
         ApiResponse<Void> response = new ApiResponse<Void>("failure", e.getMessage(), null);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class) 
+    public ResponseEntity<ApiResponse<Void>> handleUserAlreadyExist(UserAlreadyExistsException e) {
+        ApiResponse<Void> response = new ApiResponse<Void>("failure", e.getMessage(), null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUserNotFound(UserNotFoundException e) {
+        ApiResponse<Void> response = new ApiResponse<Void>("failure", e.getMessage(), null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(AuthenticationException e) {
+        ApiResponse<Void> response = new ApiResponse<Void>("failure", e.getMessage(), null);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 }
