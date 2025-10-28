@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.richardz02.personal_finance.model.Transaction;
-import com.richardz02.personal_finance.dto.transaction.TransactionSummary;
+import com.richardz02.personal_finance.dto.transaction.TransactionSummaryDTO;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
@@ -19,7 +19,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     *   income will have a value of 0, and expense will have a value of 1
     */
     @Query("""
-            SELECT new com.richardz02.personal_finance.dto.transaction.TransactionSummary (
+            SELECT new com.richardz02.personal_finance.dto.transaction.TransactionSummaryDTO (
                 SUM(CASE WHEN t.transactionType = 0 THEN t.amount ELSE 0 END),
                 SUM(CASE WHEN t.transactionType = 1 THEN t.amount ELSE 0 END),
                 SUM(CASE WHEN t.transactionType = 0 THEN t.amount ELSE 0 END) -
@@ -28,7 +28,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             FROM Transaction t
             WHERE t.date BETWEEN :startDate AND :endDate
             """)
-    TransactionSummary transactionSummary(LocalDate startDate, LocalDate endDate);
+    TransactionSummaryDTO transactionSummary(LocalDate startDate, LocalDate endDate);
 
     // This query returns a list of transactions in a given time period
     @Query("""

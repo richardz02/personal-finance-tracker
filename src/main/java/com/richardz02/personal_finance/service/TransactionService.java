@@ -7,30 +7,34 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.richardz02.personal_finance.dto.transaction.SummaryWithTransactions;
-import com.richardz02.personal_finance.dto.transaction.TransactionRequest;
-import com.richardz02.personal_finance.dto.transaction.TransactionResponse;
-import com.richardz02.personal_finance.dto.transaction.TransactionSummary;
+import com.richardz02.personal_finance.dto.transaction.SummaryWithTransactionsDTO;
+import com.richardz02.personal_finance.dto.transaction.TransactionRequestDTO;
+import com.richardz02.personal_finance.dto.transaction.TransactionResponseDTO;
+import com.richardz02.personal_finance.dto.transaction.TransactionSummaryDTO;
 import com.richardz02.personal_finance.exception.transaction.NoTransactionsException;
 import com.richardz02.personal_finance.exception.transaction.TransactionNotFoundException;
+import com.richardz02.personal_finance.exception.user.UserNotFoundException;
 import com.richardz02.personal_finance.model.Transaction;
 import com.richardz02.personal_finance.model.TransactionType;
 import com.richardz02.personal_finance.repository.TransactionRepository;
+import com.richardz02.personal_finance.repository.UserRepository;
 
 @Service
 public class TransactionService {
     private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
 
     // Inject dependency
-    public TransactionService(TransactionRepository transactionRepository) {
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) {
         this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();        
     }
 
-    public Transaction addTransaction(TransactionRequest transactionRequest) {
+    public Transaction addTransaction(TransactionRequestDTO transactionRequest) {
         // Create a new transaction object
         Transaction transaction = new Transaction();
 
@@ -45,7 +49,7 @@ public class TransactionService {
         return transaction;
     }
 
-    public Transaction updateTransaction(UUID id, TransactionRequest transactionRequest) {
+    public Transaction updateTransaction(UUID id, TransactionRequestDTO transactionRequest) {
         // Get the transaction object from the database by id
         Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new TransactionNotFoundException(id));
 
@@ -61,12 +65,12 @@ public class TransactionService {
         return transaction;
     }
 
-    public TransactionResponse getTransactionById(UUID id) {
+    public TransactionResponseDTO getTransactionById(UUID id) {
         // Get the Transaction object from the database
         Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new TransactionNotFoundException(id));
 
         // Construct a new instance of TransactionResponseDTO 
-        TransactionResponse transactionResponse = new TransactionResponse(
+        TransactionResponseDTO transactionResponse = new TransactionResponseDTO(
             transaction.getDate(),
             TransactionType.valueOf(transaction.getTransactionType()),
             transaction.getAmount(),
@@ -87,7 +91,7 @@ public class TransactionService {
         transactionRepository.deleteById(id);
     }
 
-    public SummaryWithTransactions getSummary(String period) {
+    public SummaryWithTransactionsDTO getSummary(String period) {
         // Define a start and end date to query the database for transaction summary
         LocalDate startDate;
         LocalDate endDate = LocalDate.now();
@@ -110,10 +114,11 @@ public class TransactionService {
                 throw new IllegalArgumentException("Invalid period: " + period);
         }
 
-        TransactionSummary summary = transactionRepository.transactionSummary(startDate, endDate);
+        // Get summary and list of transaction in user selected time period
+        TransactionSummaryDTO summary = transactionRepository.transactionSummary(startDate, endDate);
         List<Transaction> transactionsList = transactionRepository.findTransactionsInPeriod(startDate, endDate);
 
-        SummaryWithTransactions summaryWithTransactions = new SummaryWithTransactions(summary, transactionsList);
+        SummaryWithTransactionsDTO summaryWithTransactions = new SummaryWithTransactionsDTO(summary, transactionsList);
         return summaryWithTransactions;
     }
 }

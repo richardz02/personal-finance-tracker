@@ -1,9 +1,7 @@
 package com.richardz02.personal_finance.controller;
 
-import java.time.LocalDate;
 import java.util.*;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.richardz02.personal_finance.dto.ApiResponse;
-import com.richardz02.personal_finance.dto.transaction.SummaryWithTransactions;
-import com.richardz02.personal_finance.dto.transaction.TransactionRequest;
-import com.richardz02.personal_finance.dto.transaction.TransactionResponse;
+import com.richardz02.personal_finance.dto.transaction.SummaryWithTransactionsDTO;
+import com.richardz02.personal_finance.dto.transaction.TransactionRequestDTO;
+import com.richardz02.personal_finance.dto.transaction.TransactionResponseDTO;
 import com.richardz02.personal_finance.model.Transaction;
 import com.richardz02.personal_finance.service.TransactionService;
 
@@ -44,7 +42,7 @@ public class TransactionController {
 
     // Add new transaction
     @PostMapping("/transactions")
-    public ResponseEntity<ApiResponse<Transaction>> addTransaction(@Valid @RequestBody TransactionRequest transactionRequest) {
+    public ResponseEntity<ApiResponse<Transaction>> addTransaction(@Valid @RequestBody TransactionRequestDTO transactionRequest) {
         Transaction saved = transactionService.addTransaction(transactionRequest);
         ApiResponse<Transaction> response = new ApiResponse<Transaction>("success", "Transaction created", saved);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -54,7 +52,7 @@ public class TransactionController {
     @PutMapping("/transactions/{id}")
     public ResponseEntity<ApiResponse<Transaction>> updateTransaction(
             @PathVariable UUID id, 
-            @RequestBody TransactionRequest transactionUpdateRequest) {
+            @RequestBody TransactionRequestDTO transactionUpdateRequest) {
         Transaction updated = transactionService.updateTransaction(id, transactionUpdateRequest);
         ApiResponse<Transaction> response = new ApiResponse<Transaction>("success", "Transaction updated", updated);
         return ResponseEntity.ok().body(response);
@@ -62,7 +60,7 @@ public class TransactionController {
 
     // Return a transaction by id
     @GetMapping("/transactions/{id}")
-    public TransactionResponse getTransactionById(@PathVariable UUID id) {
+    public TransactionResponseDTO getTransactionById(@PathVariable UUID id) {
         return transactionService.getTransactionById(id);
     }
 
@@ -77,9 +75,9 @@ public class TransactionController {
     // Todo: API end points which takes in a param "period" which is specified by the user to view all transactions
     // in this period of time (day, week, month, year, all time)
     @GetMapping("/transactions/summary")
-    public ResponseEntity<ApiResponse<SummaryWithTransactions>> getTransactionSummary(@RequestParam(defaultValue = "day") String period) {
-        SummaryWithTransactions summaryWithTransactions = transactionService.getSummary(period);
-        ApiResponse<SummaryWithTransactions> response = new ApiResponse<SummaryWithTransactions>("success", "Fetched transaction summary for " + period, summaryWithTransactions);
+    public ResponseEntity<ApiResponse<SummaryWithTransactionsDTO>> getTransactionSummary(@RequestParam(defaultValue = "day") String period) {
+        SummaryWithTransactionsDTO summaryWithTransactions = transactionService.getSummary(period);
+        ApiResponse<SummaryWithTransactionsDTO> response = new ApiResponse<SummaryWithTransactionsDTO>("success", "Fetched transaction summary for " + period, summaryWithTransactions);
         return ResponseEntity.ok().body(response);
     }
 };
