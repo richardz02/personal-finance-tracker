@@ -4,16 +4,16 @@ import java.util.List;
 
 import com.richardz02.personal_finance.model.Transaction;
 
-public class SummaryWithTransactions {
-    TransactionSummary summary;
+public class SummaryWithTransactionsDTO {
+    TransactionSummaryDTO summary;
     List<Transaction> transactions;
     
-    public SummaryWithTransactions(TransactionSummary summary, List<Transaction> transactions) {
+    public SummaryWithTransactionsDTO(TransactionSummaryDTO summary, List<Transaction> transactions) {
         this.summary = summary;
         this.transactions = transactions;
     }
     
-    public TransactionSummary getSummary() {
+    public TransactionSummaryDTO getSummary() {
         return summary;
     }
 

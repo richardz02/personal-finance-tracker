@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-public class TransactionResponse {
+public class TransactionResponseDTO {
 
     @NotNull(message = "Date is required")
     private LocalDate date;
@@ -23,7 +23,7 @@ public class TransactionResponse {
     @Size(max = 200)
     private String description;
 
-    public TransactionResponse(LocalDate date, TransactionType transactionType, double amount, String description) {
+    public TransactionResponseDTO(LocalDate date, TransactionType transactionType, double amount, String description) {
         this.date = date;
         this.transactionType = transactionType;
         this.amount = amount;
