@@ -4,20 +4,31 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Transaction {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;  // Make id the primary key in the database
+
     private LocalDate date;
     private TransactionType transactionType;
     private double amount; 
     private String description;
 
+    // Link Transaction to User
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "user_id", nullable = false)
+    // private User user;
+
     // Required default no-args constructor since JPA uses reflection to create entity objects
     public Transaction() {
-        this.id = UUID.randomUUID();
         this.date = LocalDate.now();
     }
 
