@@ -28,3 +28,6 @@ target/
 
 # Transaction directory (from Bruno API testing)
 transactions/
+
+# application.properties file
+src/main/resources/application.properties
