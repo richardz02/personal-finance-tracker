@@ -35,6 +35,10 @@ public class User {
     }
 
     // Getters
+    public String getUserId() {
+        return userId.toString();
+    }
+
     public String getUserName() {
         return username;
     }

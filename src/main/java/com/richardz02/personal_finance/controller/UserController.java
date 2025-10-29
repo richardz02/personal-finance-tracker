@@ -17,25 +17,9 @@ import com.richardz02.personal_finance.service.UserService;
 @RequestMapping("/api/v1")
 public class UserController {
 
-    private final UserService userService;
     private final AuthService authService;
 
-    public UserController(UserService userService, AuthService authService) {
-        this.userService = userService;
+    public UserController(AuthService authService) {
         this.authService = authService;
-    }
-    
-    @PostMapping("/user/signup")
-    public ResponseEntity<ApiResponse<User>> userSignup(@RequestBody UserAuthDTO userSignup) {
-        User saved = userService.createUser(userSignup);
-        ApiResponse<User> response = new ApiResponse<>("success", "User created", saved);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @PostMapping("/user/login")
-    public ResponseEntity<ApiResponse<Void>> userLogin(@RequestBody UserAuthDTO userLogin) {
-        authService.authenticateUserLogin(userLogin); 
-        ApiResponse<Void> response = new ApiResponse<Void>("success", "Login success", null);
-        return ResponseEntity.ok().body(response);
     }
 }

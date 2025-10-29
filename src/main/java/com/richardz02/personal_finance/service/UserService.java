@@ -15,22 +15,4 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-
-    public User createUser(UserAuthDTO userSignup) {
-        if (userRepository.existsByUsername(userSignup.getUsername())) {
-            throw new UserAlreadyExistsException("Username is not available");
-        }
-
-        // Create a new user object
-        User user = new User();
-
-        // Set username and password hash
-        user.setUserName(userSignup.getUsername());
-        user.setpasswordHash(PasswordUtil.hashingPassword(userSignup.getPassword()));
-        
-        // Save created user in database
-        userRepository.save(user);
-
-        return user;
-    }
 }
