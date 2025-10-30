@@ -1,6 +1,6 @@
 package com.richardz02.personal_finance.dto.user;
 
-public class UserAuthDTO {
+public class UserAuthRequestDTO {
     private String username;
     private String password;
     
