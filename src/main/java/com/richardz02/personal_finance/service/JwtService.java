@@ -38,4 +38,14 @@ public class JwtService {
                     .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
                     .compact();
     }
+
+    // Validate a jwt
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes())).build().parseSignedClaims(token); 
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
+    }
 }
