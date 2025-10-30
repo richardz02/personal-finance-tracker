@@ -1,10 +1,10 @@
 package com.richardz02.personal_finance.service;
 
-import java.util.Optional;
-
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.richardz02.personal_finance.dto.user.UserAuthDTO;
+import com.richardz02.personal_finance.dto.user.UserAuthRequestDTO;
+import com.richardz02.personal_finance.dto.user.UserAuthResponseDTO;
 import com.richardz02.personal_finance.exception.auth.AuthenticationException;
 import com.richardz02.personal_finance.exception.user.UserAlreadyExistsException;
 import com.richardz02.personal_finance.exception.user.UserNotFoundException;
@@ -22,26 +22,29 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
-    public String authenticateUserLogin(UserAuthDTO userLogin) {
+    public ResponseEntity<UserAuthResponseDTO> authenticateUserLogin(UserAuthRequestDTO userLogin) {
         // Find user by username
         // if user doesn't exist, throw exception
-        Optional<User> user = userRepository.findByUsername(userLogin.getUsername());
-        if (!user.isPresent()) {
-            throw new UserNotFoundException("Username does not exist.");
-        }
+        User user = userRepository.findByUsername(userLogin.getUsername()).orElseThrow(() -> new UserNotFoundException("Username not found."));
 
-        String hashedPassword = user.get().getpasswordHash();
-        if (PasswordUtil.verifyPassword(userLogin.getPassword(), hashedPassword)) {
-            String userId = user.get().getUserId();
-            String username = user.get().getUserName();
-            return jwtService.generateToken(userId, username);
+        // If user exists, compare hashed passwords
+        // If passwords match, user has successfully identified themselves
+        // Send response back along with jwt
+        if (PasswordUtil.verifyPassword(userLogin.getPassword(), user.getpasswordHash())) {
+            String userId = user.getUserId();
+            String username = user.getUserName();
+            String token =  jwtService.generateToken(userId, username);
+
+            UserAuthResponseDTO userAuthResponse = new UserAuthResponseDTO(userId, username);
+            
+            return ResponseEntity.ok().header("Authorization", "Bearer " + token).body(userAuthResponse);
         }
         else {
             throw new AuthenticationException("Incorrect password");
         }
     }
 
-    public User userSignupRequest(UserAuthDTO userSignup) {
+    public UserAuthResponseDTO userSignupRequest(UserAuthRequestDTO userSignup) {
         if (userRepository.existsByUsername(userSignup.getUsername())) {
             throw new UserAlreadyExistsException("Username is not available");
         }
@@ -56,6 +59,8 @@ public class AuthService {
         // Save created user in database
         userRepository.save(user);
 
-        return user;
+        UserAuthResponseDTO userSignupResponse = new UserAuthResponseDTO(user.getUserId(), user.getUserName());
+
+        return userSignupResponse;
     }
 }

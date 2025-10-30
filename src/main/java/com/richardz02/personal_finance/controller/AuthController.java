@@ -8,11 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.richardz02.personal_finance.dto.ApiResponse;
-import com.richardz02.personal_finance.dto.user.UserAuthDTO;
-import com.richardz02.personal_finance.model.User;
+import com.richardz02.personal_finance.dto.user.UserAuthRequestDTO;
+import com.richardz02.personal_finance.dto.user.UserAuthResponseDTO;
 import com.richardz02.personal_finance.service.AuthService;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -24,20 +22,14 @@ public class AuthController {
     }
 
     @PostMapping("/auth/signup")
-    public ResponseEntity<ApiResponse<User>> userSignup(@RequestBody UserAuthDTO userSignup) {
-        User saved = authService.userSignupRequest(userSignup);
-        ApiResponse<User> response = new ApiResponse<>("success", "User created", saved);
+    public ResponseEntity<ApiResponse<UserAuthResponseDTO>> userSignup(@RequestBody UserAuthRequestDTO userSignup) {
+        UserAuthResponseDTO userInfo = authService.userSignupRequest(userSignup);
+        ApiResponse<UserAuthResponseDTO> response = new ApiResponse<>("success", "User created", userInfo);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<ApiResponse<Void>> verifyUserLogin(@RequestBody UserAuthDTO userLogin, HttpServletResponse httpResponse) {
-        String jwt = authService.authenticateUserLogin(userLogin);
-        
-        // Set jwt in HTTP authorization header
-        httpResponse.setHeader("Authorization", "Bearer " + jwt);
-
-        ApiResponse<Void> response = new ApiResponse<>("success", "Login success", null); 
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<UserAuthResponseDTO> verifyUserLogin(@RequestBody UserAuthRequestDTO userLogin) {
+        return authService.authenticateUserLogin(userLogin);
     }
 }
