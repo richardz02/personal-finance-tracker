@@ -5,11 +5,14 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
+    // Read secret key, expiration, and issuer from application.properties file
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -18,7 +21,8 @@ public class JwtService {
 
     @Value("${jwt.issuer}")
     private String issuer;
-
+    
+    // Generate a jwt, and set payload 
     public String generateToken(String userId, String username) {
         long now = System.currentTimeMillis(); // Get current time in milliseconds
         Date issuedAt = new Date(now); // Create Date object for now
@@ -31,7 +35,7 @@ public class JwtService {
                     .claim("name", username)
                     .issuedAt(issuedAt)
                     .expiration(expirationDate)
-                    .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                    .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
                     .compact();
     }
 }
