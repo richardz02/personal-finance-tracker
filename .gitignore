@@ -31,3 +31,8 @@ transactions/
 
 # application.properties file
 src/main/resources/application.properties
+
+# Eclipse project files
+.classpath
+.project
+.settings/
