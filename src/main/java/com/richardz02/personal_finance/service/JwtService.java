@@ -9,6 +9,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.Claims;
 
 @Service
 public class JwtService {
@@ -39,7 +40,23 @@ public class JwtService {
                     .compact();
     }
 
-    // Validate a jwt
+    // Extract username from the token
+    public String extractUsernameFromToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                                .verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
+                                .build()
+                                .parseSignedClaims(token)
+                                .getPayload();
+
+            String username = claims.get("name", String.class);
+            return username;
+        } catch (JwtException e) {
+            return null;
+        }
+    }
+
+    // Validate a jwt and extract user id from the token
     public boolean validateToken(String token) {
         try {
             Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes())).build().parseSignedClaims(token); 
