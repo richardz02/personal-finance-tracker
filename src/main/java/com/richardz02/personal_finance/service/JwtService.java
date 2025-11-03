@@ -59,7 +59,24 @@ public class JwtService {
     // Validate a jwt and extract user id from the token
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes())).build().parseSignedClaims(token); 
+            Claims claims = Jwts.parser()
+                                .verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
+                                .build()
+                                .parseSignedClaims(token)
+                                .getPayload(); 
+            
+            // Validate issuer
+            String issuer = claims.getIssuer();
+            if (!issuer.equals("BigRich")) {
+                return false;
+            }
+            
+            // Validate expiration
+            Date expiration = claims.getExpiration();
+            if (expiration == null || expiration.before(new Date())) {
+                return false;
+            }
+
             return true;
         } catch (JwtException e) {
             return false;
