@@ -35,10 +35,17 @@ function TransactionForm({
   async function createTransaction(data) {
     // TODO: Add checks to make sure user input fields are of correct data type
 
+    const token = localStorage.getItem("jwt");
+
     try {
       const response = await axios.post(
         "http://127.0.0.1:8080/api/v1/transactions",
-        data
+        data,
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
       );
 
       // Tell parent to refresh data
@@ -55,10 +62,17 @@ function TransactionForm({
 
   // Send updated transaction data to backend API to update a transaction
   const updateTransaction = async (data) => {
+    const token = localStorage.getItem("jwt");
+
     try {
       const response = await axios.put(
         `http://127.0.0.1:8080/api/v1/transactions/${transaction.id}`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
       );
       console.log(response.data.message);
 

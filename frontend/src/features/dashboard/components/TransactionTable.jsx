@@ -18,9 +18,16 @@ function TransactionTable({
       "Are you sure you want to delete this transaction?"
     );
     if (confirmation) {
+      const token = localStorage.getItem("jwt");
+
       try {
         const response = await axios.delete(
-          `http://127.0.0.1:8080/api/v1/transactions/${transactionId}`
+          `http://127.0.0.1:8080/api/v1/transactions/${transactionId}`,
+          {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          }
         );
 
         // Refresh after deleting transaction
