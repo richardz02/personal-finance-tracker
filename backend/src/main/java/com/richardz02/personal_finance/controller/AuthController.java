@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<UserAuthResponseDTO> verifyUserLogin(@RequestBody UserAuthRequestDTO userLogin) {
+    public ResponseEntity<ApiResponse<UserAuthResponseDTO>> verifyUserLogin(@RequestBody UserAuthRequestDTO userLogin) {
         return authService.authenticateUserLogin(userLogin);
     }
 }
