@@ -16,7 +16,7 @@ function Dashboard() {
   const [summary, setSummary] = useState(null); // Transaction summary
   const [period, setPeriod] = useState("day"); // Time period in which we want to display our summaries for
 
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   // Get summary
   const fetchTransactionSummary = useCallback(async () => {
@@ -33,7 +33,7 @@ function Dashboard() {
       // Get the jwt from local storage
       const token = localStorage.getItem("jwt");
 
-      // Send request to fetch transaciton summary for user specified time period
+      // Send request to fetch transaciton summary for user specified time period, attach jwt in authorization header
       const response = await axios.get(
         `http://127.0.0.1:8080/api/v1/transactions/summary?period=${period}`,
         {
@@ -99,6 +99,10 @@ function Dashboard() {
         onAddClick={handleOpenForm}
         onEditClick={handleEditTransaction}
       />
+
+      <Button variant="outlined" onClick={logout}>
+        Log out
+      </Button>
     </>
   );
 }
