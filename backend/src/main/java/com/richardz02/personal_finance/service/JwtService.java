@@ -67,7 +67,7 @@ public class JwtService {
             
             // Validate issuer
             String issuer = claims.getIssuer();
-            if (!issuer.equals("BigRich")) {
+            if (!issuer.trim().equals("BigRich")) {
                 return false;
             }
             
